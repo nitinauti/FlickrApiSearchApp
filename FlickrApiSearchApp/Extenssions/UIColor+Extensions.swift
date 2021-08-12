@@ -57,9 +57,7 @@ extension UIColor {
             return .black
         }
     }
-    
 }
-
 
 extension UIScreen {
     var isDarkMode: Bool {

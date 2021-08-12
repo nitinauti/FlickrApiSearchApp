@@ -18,10 +18,8 @@ class FlickrSearchInteractor: FlickrSearchInteractorProtocol {
             switch result {
             case .success(let FlickrSearch):
                 self.presenter?.flickrSearchSuccess(flickrPhotos: FlickrSearch.photos)
-                
             case .failure(let error):
-                self.presenter?.recivedError(message:error.message)
-                
+                self.presenter?.flickrSearchError(NetworkError.apiError(error))
             }
         })
     }

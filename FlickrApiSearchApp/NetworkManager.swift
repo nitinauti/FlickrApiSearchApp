@@ -69,7 +69,8 @@ public class NetworkManager {
     
     /// download  image form request called from each module
     static func downloadRequest(_ url: URL, size: CGSize, scale: CGFloat, completion: @escaping (Result<UIImage, NetworkError>) -> Void) -> URLSessionDownloadTask {
-        let downloadTask = URLSession.shared.downloadTask(with: url) { (location: URL?, response: URLResponse?, error: Error?) in
+       
+     let downloadTask = URLSession.shared.downloadTask(with: url) { (location: URL?, response: URLResponse?, error: Error?) in
             if let error = error {
                 completion(.failure(.apiError(error)))
                 return

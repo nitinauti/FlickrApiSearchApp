@@ -62,20 +62,4 @@ extension UIImageView {
         )
     }
     
-    //MARK: Fade transition Animation
-    func fadeTransition(
-        with image: UIImage?,
-        duration: TimeInterval = 0.5,
-        completion: ((Bool) -> Void)? = nil
-    ) {
-        UIView.transition(
-            with: self,
-            duration: duration,
-            options: .transitionCrossDissolve,
-            animations: {
-                self.image = image
-            },
-            completion: completion
-        )
-    }
 }

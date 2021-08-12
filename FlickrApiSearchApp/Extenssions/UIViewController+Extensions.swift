@@ -8,7 +8,7 @@
 import UIKit
 
 extension UIViewController {
-    
+
     func showAlert(title: String, message: String, retryAction: (() -> Void)? = nil) {
         let alertViewController = UIAlertController(title: title, message: message, preferredStyle: .alert)
         if retryAction != nil {
@@ -21,4 +21,17 @@ extension UIViewController {
         present(alertViewController, animated: true)
     }
     
+    func showAlertView(title: String, retryAction: (() -> Void)? = nil) {
+        let alertViewController = UIAlertController(title: title, message: "", preferredStyle: .alert)
+  
+        let title =  Strings.cancel
+        alertViewController.addAction(UIAlertAction(title: title, style: .default) { _ in
+            retryAction?()
+        })
+        present(alertViewController, animated: true)
+    }
+    
+    func dissmissAlertView(){
+        self.dismiss(animated: true, completion: nil)
+    }
 }

@@ -62,8 +62,6 @@ final class FlickrSearchViewController: UIViewController, FlickrSearchViewProtoc
         themeViews()
     }
     
-    // MARK: Private Functions
-    
     private func setupViews() {
         configureCollectionView()
         configureSearchController()
@@ -74,7 +72,6 @@ final class FlickrSearchViewController: UIViewController, FlickrSearchViewProtoc
         collectionView.backgroundColor = .backgroundColor
     }
     
-    // MARK: configureSearchController
     private func configureSearchController() {
         navigationItem.searchController = searchController
         navigationController?.navigationBar.prefersLargeTitles = true
@@ -82,39 +79,45 @@ final class FlickrSearchViewController: UIViewController, FlickrSearchViewProtoc
         definesPresentationContext = true
     }
     
-    //MARK: ConfigureCollectionView
     private func configureCollectionView() {
         view.addSubview(collectionView)
         collectionView.edgesToSuperView()
-        collectionView.register(FlickrImageCell.self)
-        collectionView.register(FooterView.self, ofKind: UICollectionView.elementKindSectionFooter)
+        collectionView.register(FlickrImageCell.self, forCellWithReuseIdentifier: FlickrImageCell.reuseIdentifier)
     }
     
-    // FlickrSearchViewInput
+    /// maintain diffrent state of api
     func changeViewState(_ state: ViewState) {
         viewState = state
         switch state {
         case .loading:
             if flickrSearchViewModel == nil {
                 showSpinner()
+                showAlertView(title: Strings.cancelLoading, retryAction: { [weak self] in
+                    ImageDownloader.shared.cancelAll()
+                })
             }
         case .content:
             hideSpinner()
+            dissmissAlertView()
+
         case .error(let message):
             hideSpinner()
+            dissmissAlertView()
             showAlert(title: Strings.error, message: message, retryAction: { [unowned self] in
-                self.presenter?.searchFlickrPhotos(SearchImageName: self.searchText)
+                self.presenter?.getSearchedFlickrPhotos(SearchImageName: self.searchText)
             })
         default:
             break
         }
     }
     
-    //MARK: FlickrSearchViewInput
+
+    /// Recvied image array From API and passed in model class
     func displayFlickrSearchImages(with viewModel: FlickrSearchViewModel) {
         flickrSearchViewModel = viewModel
         collectionView.reloadData()
     }
+    
     
     func insertFlickrSearchImages(with viewModel: FlickrSearchViewModel, at indexPaths: [IndexPath]) {
         collectionView.performBatchUpdates({
@@ -130,6 +133,7 @@ final class FlickrSearchViewController: UIViewController, FlickrSearchViewProtoc
     }
     
     //MARK: FlickrSearchEventDelegate
+    // called after searching text using serch view controller
     func didTapSearchBar(withText searchText: String) {
         searchController.isActive = false
         guard !searchText.isEmpty || searchText != self.searchText else { return }
@@ -138,13 +142,8 @@ final class FlickrSearchViewController: UIViewController, FlickrSearchViewProtoc
         self.searchText = searchText
         searchController.searchBar.text = searchText
         ImageDownloader.shared.cancelAll()
-        presenter?.searchFlickrPhotos(SearchImageName: searchText)
+        presenter?.getSearchedFlickrPhotos(SearchImageName: searchText)
     }
-    
-    func recivedError(message: String) {
-        print(message)
-    }
-    
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
@@ -153,7 +152,6 @@ final class FlickrSearchViewController: UIViewController, FlickrSearchViewProtoc
         }
     }
 }
-
 
 //MARK: UICollectionViewDataSource & UICollectionViewDelegate
 extension FlickrSearchViewController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
@@ -166,7 +164,10 @@ extension FlickrSearchViewController: UICollectionViewDataSource, UICollectionVi
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(for: indexPath) as FlickrImageCell
+        
+        var cell = FlickrImageCell()
+        
+        cell = collectionView.dequeueReusableCell(withReuseIdentifier: FlickrImageCell.reuseIdentifier, for: indexPath) as! FlickrImageCell
         guard let viewModel = flickrSearchViewModel else {
             return cell
         }
@@ -180,35 +181,8 @@ extension FlickrSearchViewController: UICollectionViewDataSource, UICollectionVi
         guard viewState != .loading, indexPath.row == (viewModel.photoCount - 1) else {
             return
         }
-        presenter?.searchFlickrPhotos(SearchImageName: searchText)
+        presenter?.getSearchedFlickrPhotos(SearchImageName: searchText)
     }
     
-    func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        guard let viewModel = flickrSearchViewModel else { return }
-        guard viewState != .loading, indexPath.row == (viewModel.photoCount - 1) else {
-            return
-        }
-        let imageURL = viewModel.imageUrlAt(indexPath.row)
-        ImageDownloader.shared.changeDownloadPriority(for: imageURL)
-    }
-    
-    //MARK: UICollectionViewFooter
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {
-        if viewState == .loading && flickrSearchViewModel != nil {
-            return CGSize(width: Constants.screenWidth, height: 50)
-        }
-        return CGSize.zero
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String,  at indexPath: IndexPath) -> UICollectionReusableView {
-        switch kind {
-        case UICollectionView.elementKindSectionFooter:
-            let footerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, for: indexPath) as FooterView
-            return footerView
-        default:
-            assert(false, "Unexpected element kind")
-        }
-    }
-
 }
 

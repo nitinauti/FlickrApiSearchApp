@@ -27,14 +27,19 @@ final class ImageDownloader {
     private init() {}
     
     func downloadImage(withURL imageURL: URL, size: CGSize, scale: CGFloat = UIScreen.main.scale, completion: @escaping ImageDownloadCompletionHander) {
+      
         if let cachedImage = imageCache.object(forKey: imageURL.absoluteString as NSString) {
             completion(cachedImage, true, imageURL, nil)
+       
         } else if let existingImageOperations = downloadQueue.operations as? [ImageOperation],
+           
             let imgOperation = existingImageOperations.first(where: {
                 return ($0.imageURL == imageURL) && $0.isExecuting && !$0.isFinished
-            }) {
+            }){
             imgOperation.queuePriority = .high
+       
         } else {
+            
             let imageOperation = ImageOperation(imageURL: imageURL, size: size, scale: scale)
             imageOperation.queuePriority = .veryHigh
             imageOperation.imageDownloadCompletionHandler = { [unowned self] result in
@@ -46,27 +51,18 @@ final class ImageDownloader {
                     completion(nil, false, imageURL, error)
                 }
             }
+            
             downloadQueue.addOperation(imageOperation)
         }
     }
     
-    func changeDownloadPriority(for imageURL: URL) {
-        guard let ongoingImageOperations = downloadQueue.operations as? [ImageOperation] else {
-            return
-        }
-        let imageOperations = ongoingImageOperations.filter {
-            $0.imageURL.absoluteString == imageURL.absoluteString && $0.isFinished == false && $0.isExecuting == true
-        }
-        guard let operation = imageOperations.first else {
-            return
-        }
-        operation.queuePriority = .normal
-    }
     
+    /// for cancel all opration
     func cancelAll() {
         downloadQueue.cancelAllOperations()
     }
     
+    /// for cancel single opration
     func cancelOperation(imageUrl: URL) {
         if let imageOperations = downloadQueue.operations as? [ImageOperation],
             let operation = imageOperations.first(where: { $0.imageURL == imageUrl }) {

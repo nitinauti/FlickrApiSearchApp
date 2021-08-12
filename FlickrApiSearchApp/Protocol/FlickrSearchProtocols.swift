@@ -68,10 +68,7 @@ protocol FlickrSearchViewProtocol: BaseViewInput {
     func displayFlickrSearchImages(with viewModel: FlickrSearchViewModel)
     func insertFlickrSearchImages(with viewModel: FlickrSearchViewModel, at indexPaths: [IndexPath])
     func resetViews()
-    func changeViewState(_ state: ViewState)
-    func recivedError(message: String)
-
-    
+    func changeViewState(_ state: ViewState)    
 }
 
 protocol FlickrSearchWireFrameProtocol: class {
@@ -93,9 +90,9 @@ protocol FlickrSearchPresenterProtocol: class {
     */
     
     func clearData()
-    func searchFlickrPhotos(SearchImageName: String)
+    func getSearchedFlickrPhotos(SearchImageName: String)
     func flickrSearchSuccess(flickrPhotos: FlickrPhotos)
-    func recivedError(message: String)
+    func flickrSearchError(_ error: NetworkError)
 
     /**
     * Add here your methods for communication INTERACTOR -> PRESENTER

@@ -13,6 +13,7 @@ enum Strings {
     static let flickrSearchTitle = "Flickr Search"
     static let placeholder = "Search Flickr images..."
     static let cancel = "Cancel"
+    static let cancelLoading = "Cancel API DownLoading...."
     static let ok = "Ok"
     static let retry = "Retry"
     static let error = "Error"

@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-public class NavaigationContoller:UINavigationController {
+public class NavaigationContoller: UINavigationController {
     static private var window: UIWindow?
     static var RootViewController = UINavigationController()
 

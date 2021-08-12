@@ -24,6 +24,7 @@ struct FlickrSearchViewModel {
         return photoUrlList.count
     }
     
+    /// append list of url to existing url array
     mutating func addMorePhotoUrls(_ photoUrls: [URL]) {
         self.photoUrlList += photoUrls
     }

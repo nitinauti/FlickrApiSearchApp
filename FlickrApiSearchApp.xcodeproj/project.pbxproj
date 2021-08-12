@@ -39,7 +39,6 @@
 		0BB5D9EE26C5085500675518 /* FlickrImageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BB5D9ED26C5085500675518 /* FlickrImageCell.swift */; };
 		0BB5D9F326C5086500675518 /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BB5D9F226C5086500675518 /* SearchViewController.swift */; };
 		0BB5D9F826C5087500675518 /* FooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BB5D9F726C5087500675518 /* FooterView.swift */; };
-		0BB5D9FD26C5098C00675518 /* UICollectionView+extenssion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BB5D9FC26C5098C00675518 /* UICollectionView+extenssion.swift */; };
 		0BB5DA0526C50B8800675518 /* NavaigationContoller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BB5DA0426C50B8800675518 /* NavaigationContoller.swift */; };
 /* End PBXBuildFile section */
 
@@ -99,7 +98,6 @@
 		0BB5D9ED26C5085500675518 /* FlickrImageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlickrImageCell.swift; sourceTree = "<group>"; };
 		0BB5D9F226C5086500675518 /* SearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewController.swift; sourceTree = "<group>"; };
 		0BB5D9F726C5087500675518 /* FooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FooterView.swift; sourceTree = "<group>"; };
-		0BB5D9FC26C5098C00675518 /* UICollectionView+extenssion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UICollectionView+extenssion.swift"; sourceTree = "<group>"; };
 		0BB5DA0426C50B8800675518 /* NavaigationContoller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavaigationContoller.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -216,10 +214,10 @@
 		0BB5D97326C5008D00675518 /* Networking */ = {
 			isa = PBXGroup;
 			children = (
-				0BB5D9A926C502E700675518 /* NetworkManager.swift */,
-				0BB5D99F26C5028A00675518 /* NetworkError.swift */,
-				0BB5D9A426C502A900675518 /* APIEndPoint.swift */,
 				0BB5D9AE26C5031B00675518 /* Reachability.swift */,
+				0BB5D9A426C502A900675518 /* APIEndPoint.swift */,
+				0BB5D99F26C5028A00675518 /* NetworkError.swift */,
+				0BB5D9A926C502E700675518 /* NetworkManager.swift */,
 			);
 			name = Networking;
 			sourceTree = "<group>";
@@ -240,7 +238,6 @@
 				0BB5D98626C5018C00675518 /* UIImage+Extensions.swift */,
 				0BB5D98B26C501A900675518 /* UIImageView+Extensions.swift */,
 				0BB5D99026C501D300675518 /* UIColor+Extensions.swift */,
-				0BB5D9FC26C5098C00675518 /* UICollectionView+extenssion.swift */,
 				0BB5DA0426C50B8800675518 /* NavaigationContoller.swift */,
 			);
 			path = Extenssions;
@@ -460,7 +457,6 @@
 				0BB5D9D026C5069D00675518 /* FlickrSearchWireframe.swift in Sources */,
 				0BB5D94026C5004000675518 /* SceneDelegate.swift in Sources */,
 				0BB5D9A526C502A900675518 /* APIEndPoint.swift in Sources */,
-				0BB5D9FD26C5098C00675518 /* UICollectionView+extenssion.swift in Sources */,
 				0BB5D9E426C5078400675518 /* flickrSearchViewModel.swift in Sources */,
 				0BB5D98226C5017100675518 /* UIViewController+Extensions.swift in Sources */,
 				0BB5DA0526C50B8800675518 /* NavaigationContoller.swift in Sources */,
