@@ -22,7 +22,7 @@ final class FlickrSearchViewController: UIViewController, FlickrSearchViewProtoc
    
     var presenter: FlickrSearchPresenterProtocol?
     var viewState: ViewState = .none
-    var flickrSearchViewModel: FlickrSearchViewModel?
+    var flickrSearchModel: FlickrSearchModel?
     var searchText = ""
     
     lazy var collectionViewLayout: UICollectionViewFlowLayout = {
@@ -90,7 +90,7 @@ final class FlickrSearchViewController: UIViewController, FlickrSearchViewProtoc
         viewState = state
         switch state {
         case .loading:
-            if flickrSearchViewModel == nil {
+            if flickrSearchModel == nil {
                 showSpinner()
                 showAlertView(title: Strings.cancelLoading, retryAction: { [weak self] in
                     ImageDownloader.shared.cancelAll()
@@ -110,30 +110,29 @@ final class FlickrSearchViewController: UIViewController, FlickrSearchViewProtoc
             break
         }
     }
-    
 
     /// Recvied image array From API and passed in model class
-    func displayFlickrSearchImages(with viewModel: FlickrSearchViewModel) {
-        flickrSearchViewModel = viewModel
+    func displayFlickrSearchImages(with viewModel: FlickrSearchModel) {
+        flickrSearchModel = viewModel
         collectionView.reloadData()
     }
     
-    
-    func insertFlickrSearchImages(with viewModel: FlickrSearchViewModel, at indexPaths: [IndexPath]) {
+    /// called method in pagination
+    func insertFlickrSearchImages(with viewModel: FlickrSearchModel, at indexPaths: [IndexPath]) {
         collectionView.performBatchUpdates({
-            self.flickrSearchViewModel = viewModel
+            self.flickrSearchModel = viewModel
             self.collectionView.insertItems(at: indexPaths)
         })
     }
     
     func resetViews() {
         searchController.searchBar.text = nil
-        flickrSearchViewModel = nil
+        flickrSearchModel = nil
         collectionView.reloadData()
     }
     
     //MARK: FlickrSearchEventDelegate
-    // called after searching text using serch view controller
+    // called after searching text using serchViewController:
     func didTapSearchBar(withText searchText: String) {
         searchController.isActive = false
         guard !searchText.isEmpty || searchText != self.searchText else { return }
@@ -153,11 +152,34 @@ final class FlickrSearchViewController: UIViewController, FlickrSearchViewProtoc
     }
 }
 
+extension FlickrSearchViewController: UISearchBarDelegate {
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+       searchBar.resignFirstResponder()
+    }
+
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        guard let text = searchBar.text else {
+            return
+        }
+        searchBar.text = text
+        searchBar.resignFirstResponder()
+        searchController.isActive = false
+        guard !searchText.isEmpty || searchText != self.searchText else { return }
+        presenter?.clearData()
+        
+        self.searchText = text
+        searchController.searchBar.text = searchText
+        ImageDownloader.shared.cancelAll()
+        presenter?.getSearchedFlickrPhotos(SearchImageName: searchText)
+    }
+}
+
 //MARK: UICollectionViewDataSource & UICollectionViewDelegate
 extension FlickrSearchViewController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        guard let viewModel = self.flickrSearchViewModel, !viewModel.isEmpty else {
+        guard let viewModel = self.flickrSearchModel, !viewModel.isEmpty else {
             return 0
         }
         return viewModel.photoCount
@@ -168,7 +190,7 @@ extension FlickrSearchViewController: UICollectionViewDataSource, UICollectionVi
         var cell = FlickrImageCell()
         
         cell = collectionView.dequeueReusableCell(withReuseIdentifier: FlickrImageCell.reuseIdentifier, for: indexPath) as! FlickrImageCell
-        guard let viewModel = flickrSearchViewModel else {
+        guard let viewModel = flickrSearchModel else {
             return cell
         }
         let imageURL = viewModel.imageUrlAt(indexPath.row)
@@ -177,7 +199,7 @@ extension FlickrSearchViewController: UICollectionViewDataSource, UICollectionVi
     }
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        guard let viewModel = flickrSearchViewModel else { return }
+        guard let viewModel = flickrSearchModel else { return }
         guard viewState != .loading, indexPath.row == (viewModel.photoCount - 1) else {
             return
         }

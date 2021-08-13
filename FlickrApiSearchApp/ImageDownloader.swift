@@ -14,10 +14,11 @@ final class ImageDownloader {
     
     private let imageCache = NSCache<NSString, UIImage>()
     
+    /// created que for adding number of concurrent opration to be added
     lazy var downloadQueue: OperationQueue = {
         let queue = OperationQueue()
         queue.name = "com.async.image.downloadQueue"
-        queue.maxConcurrentOperationCount = 4
+        queue.maxConcurrentOperationCount = 5
         queue.qualityOfService = .userInitiated
         return queue
     }()
@@ -26,10 +27,12 @@ final class ImageDownloader {
    
     private init() {}
     
+    /// Dwon load image from umage URL
     func downloadImage(withURL imageURL: URL, size: CGSize, scale: CGFloat = UIScreen.main.scale, completion: @escaping ImageDownloadCompletionHander) {
       
         if let cachedImage = imageCache.object(forKey: imageURL.absoluteString as NSString) {
             completion(cachedImage, true, imageURL, nil)
+            // if image is present it cache get it from herer
        
         } else if let existingImageOperations = downloadQueue.operations as? [ImageOperation],
            
@@ -39,7 +42,7 @@ final class ImageDownloader {
             imgOperation.queuePriority = .high
        
         } else {
-            
+           
             let imageOperation = ImageOperation(imageURL: imageURL, size: size, scale: scale)
             imageOperation.queuePriority = .veryHigh
             imageOperation.imageDownloadCompletionHandler = { [unowned self] result in
@@ -51,11 +54,9 @@ final class ImageDownloader {
                     completion(nil, false, imageURL, error)
                 }
             }
-            
             downloadQueue.addOperation(imageOperation)
         }
     }
-    
     
     /// for cancel all opration
     func cancelAll() {

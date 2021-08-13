@@ -9,7 +9,7 @@ import Foundation
 
 class FlickrSearchApiManager: FlickrSearchAPIManagerProtocol {
     
-    func getFlickrSearch(imageName: String, pageNum: Int, completionHandler: @escaping (Result<FlickrSearchPhoto, ErrorModel>) -> ()) {
+    func getFlickrSearch(imageName: String, pageNum: Int, completionHandler: @escaping (Result<FlickrSearchPhoto, NetworkError>) -> ()) {
         
         NetworkManager.connect(httpMethod: .get, request: Endpoints.getFlickrSearch(imageName, pageNum).urlRequest, responseType: FlickrSearchPhoto.self, body: Body()) { result in
             completionHandler(result)

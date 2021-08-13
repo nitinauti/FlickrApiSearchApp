@@ -1,5 +1,5 @@
 //
-//  flickrSearchViewModel.swift
+//  flickrSearchModel.swift
 //  FlickrApiSearchApp
 //
 //  Created by Nitin Auti on 12/08/21.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct FlickrSearchViewModel {
+struct FlickrSearchModel {
     
     var photoUrlList: [URL] = []
     
@@ -30,7 +30,7 @@ struct FlickrSearchViewModel {
     }
 }
 
-extension FlickrSearchViewModel {
+extension FlickrSearchModel {
     
     func imageUrlAt(_ index: Int) -> URL {
         guard !photoUrlList.isEmpty else {

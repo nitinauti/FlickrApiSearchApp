@@ -8,21 +8,14 @@
 import Foundation
 import UIKit
 
-enum ErrorTypes: String {
-    case domainError = "Domain Error"
-    case decodingError = "We are facing some issues. Please try again later"
-    case noInternetError = "No internet connection. Please try again after some time"
-}
-
-
 public class NetworkManager {
     
     /// Api Base request called from each module
-    static func connect<RequestType: Codable, ResponseType: Decodable>(httpMethod: HTTPMethod, request: URLRequest, responseType: ResponseType.Type, body: RequestType, completion: @escaping (Result<ResponseType, ErrorModel>) -> Void) {
+    static func connect<RequestType: Codable, ResponseType: Decodable>(httpMethod: HTTPMethod, request: URLRequest, responseType: ResponseType.Type, body: RequestType, completion: @escaping (Result<ResponseType, NetworkError>) -> Void) {
         
         if !Reachability.isConnectedToNetwork() {
             DispatchQueue.main.async {
-                completion(.failure(ErrorModel(message: ErrorTypes.noInternetError.rawValue)))
+                completion(.failure(NetworkError.noInternetError))
             }
             return
         }
@@ -37,7 +30,7 @@ public class NetworkManager {
         guard let data = data, error == nil else {
                 if let error = error as NSError?, error.domain == NSURLErrorDomain {
                     DispatchQueue.main.async {
-                        completion(.failure(ErrorModel(message: ErrorTypes.decodingError.rawValue)))
+                        completion(.failure(NetworkError.apiError(error)))
                     }
                 }
                 return
@@ -52,13 +45,13 @@ public class NetworkManager {
                     return
                 } catch {
                     DispatchQueue.main.async {
-                        completion(.failure(ErrorModel(message: ErrorTypes.decodingError.rawValue)))
+                        completion(.failure(NetworkError.decodingError))
                     }
                     return
                }
             } else {
                     DispatchQueue.main.async {
-                        completion(.failure(ErrorModel(message: ErrorTypes.decodingError.rawValue)))
+                        completion(.failure(NetworkError.somethingWentWrong))
                     }
                     return
             }

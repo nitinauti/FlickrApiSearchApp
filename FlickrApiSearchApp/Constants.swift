@@ -8,7 +8,6 @@
 import Foundation
 import UIKit
 
-//MARK: String Constants
 enum Strings {
     static let flickrSearchTitle = "Flickr Search"
     static let placeholder = "Search Flickr images..."
@@ -20,7 +19,6 @@ enum Strings {
     static let close = "close"
 }
 
-//MARK: Numeric Constants
 enum Constants {
     static let screenWidth: CGFloat = UIScreen.main.bounds.width
     static let defaultSpacing: CGFloat = 1
@@ -30,8 +28,6 @@ enum Constants {
     static let defaultPageSize: Int = 20
 }
 
-
-//MARK: NetworkAPI Constants
 enum APIConstants {
     static let flickrAPIKey = "e4ec25586b1907ed41c31cdfcd1ed19e" //Change the API Key here
 }

@@ -18,8 +18,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     /// Configure URLCache for Image Caching
     fileprivate func configureURLCache() {
-        let memoryCapacity = 1000 * 1024 * 1024 // 1 GB Memory Cache
-        let diskCapacity = 1000 * 1024 * 1024 // 1 GB Disk Cache
+        let memoryCapacity = 500 * 1024 * 1024 // 500 MB Memory Cache
+        let diskCapacity = 5000 * 1024 * 1024 // 500 MB Disk Cache
         let cache = URLCache(memoryCapacity: memoryCapacity, diskCapacity: diskCapacity, diskPath: "DataCachePath")
         URLCache.shared = cache
     }

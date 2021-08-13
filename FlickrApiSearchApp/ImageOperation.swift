@@ -22,6 +22,7 @@ final class ImageOperation: Operation {
         self.scale = scale
     }
     
+    /// opration sate
     private enum OperationState: String, Equatable {
         case ready = "isReady"
         case executing = "isExecuting"
@@ -49,7 +50,6 @@ final class ImageOperation: Operation {
     }
     
     // MARK: - Various `Operation` properties
-    
     override var isReady: Bool {
         return state == .ready && super.isReady
     }
@@ -64,7 +64,6 @@ final class ImageOperation: Operation {
     
     
     // MARK: - Start
-    
     override func start() {
         if isCancelled {
             finish()
@@ -79,15 +78,13 @@ final class ImageOperation: Operation {
     }
     
     // MARK: - Finish
-    
-    func finish() {
+        func finish() {
         if isExecuting {
             state = .finished
         }
     }
     
     // MARK: - Cancel
-    
     override func cancel() {
         downloadTask?.cancel()
         finish()
@@ -100,6 +97,7 @@ final class ImageOperation: Operation {
     }
     
     private func downloadImage() {
+        print("called for get image from image URL")
         downloadTask = NetworkManager.downloadRequest(imageURL, size: size, scale: UIScreen.main.scale, completion: { [weak self] (result: Result<UIImage, NetworkError>) in
             self?.imageDownloadCompletionHandler?(result)
             self?.finish()

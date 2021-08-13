@@ -10,7 +10,7 @@ class FlickrSearchPresenter {
     var view: FlickrSearchViewProtocol?
     var interactor: FlickrSearchInteractorProtocol?
     var wireFrame: FlickrSearchWireFrameProtocol?
-    var flickrSearchViewModel: FlickrSearchViewModel!
+    var flickrSearchModel: FlickrSearchModel!
     
     var pageNum = Constants.defaultPageNum
     var totalCount = Constants.defaultTotalCount
@@ -49,11 +49,11 @@ extension FlickrSearchPresenter: FlickrSearchPresenterProtocol {
         }
         /// initally Total count will be zero
         if totalCount == Constants.defaultTotalCount {
-            flickrSearchViewModel = FlickrSearchViewModel(photoUrlList: flickrPhotoUrlList)
+            flickrSearchModel = FlickrSearchModel(photoUrlList: flickrPhotoUrlList)
             totalCount = flickrPhotos.photo.count
             totalPages = flickrPhotos.pages
             DispatchQueue.main.async { [unowned self] in
-                self.view?.displayFlickrSearchImages(with: self.flickrSearchViewModel)
+                self.view?.displayFlickrSearchImages(with: self.flickrSearchModel)
                 self.view?.changeViewState(.content)
             }
         } else {
@@ -66,13 +66,13 @@ extension FlickrSearchPresenter: FlickrSearchPresenterProtocol {
     fileprivate func appendMoreFlickrPhotos(with flickrPhotoUrlList: [URL]) {
         let previousCount = totalCount
         totalCount += flickrPhotoUrlList.count
-        flickrSearchViewModel.addMorePhotoUrls(flickrPhotoUrlList)
+        flickrSearchModel.addMorePhotoUrls(flickrPhotoUrlList)
       
         let indexPaths: [IndexPath] = (previousCount..<totalCount).map {
             return IndexPath(item: $0, section: 0)
         }
         DispatchQueue.main.async { [unowned self] in
-            self.view?.insertFlickrSearchImages(with: self.flickrSearchViewModel, at: indexPaths)
+            self.view?.insertFlickrSearchImages(with: self.flickrSearchModel, at: indexPaths)
             self.view?.changeViewState(.content)
         }
     }
@@ -93,7 +93,7 @@ extension FlickrSearchPresenter: FlickrSearchPresenterProtocol {
         pageNum = Constants.defaultPageNum
         totalCount = Constants.defaultTotalCount
         totalPages = Constants.defaultTotalCount
-        flickrSearchViewModel = nil
+        flickrSearchModel = nil
         view?.resetViews()
         view?.changeViewState(.none)
     }
