@@ -37,14 +37,7 @@ final class ImageDownloader {
         if let cachedImage = imageCache.object(forKey: imageURL.absoluteString as NSString) {
             completion(cachedImage, true, imageURL, nil)
         
-        } else if let existingImageOperations = downloadQueue.operations as? [ImageOperation],
-            let imgOperation = existingImageOperations.first(where: {
-                return ($0.imageURL == imageURL) && $0.isExecuting && !$0.isFinished
-            }) {
-            imgOperation.queuePriority = .high
-       
-        } else {
-            
+        }else {
             let imageOperation = ImageOperation(imageURL: imageURL, network: network)
             imageOperation.queuePriority = .veryHigh
             imageOperation.imageDownloadCompletionHandler = { [unowned self] result in
@@ -59,8 +52,6 @@ final class ImageDownloader {
             downloadQueue.addOperation(imageOperation)
         }
     }
-
-    
     
     func cancelAll() {
         downloadQueue.cancelAllOperations()

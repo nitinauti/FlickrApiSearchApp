@@ -26,7 +26,7 @@ enum Constants {
     static let numberOfColumns: CGFloat = 2
     static let defaultPageNum: Int = 0
     static let defaultTotalCount: Int = 0
-    static let defaultPageSize: Int = 100
+    static let defaultPageSize: Int = 20
 }
 
 enum APIConstants {
