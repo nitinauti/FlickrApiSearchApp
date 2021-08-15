@@ -66,7 +66,6 @@ protocol FlickrSearchViewProtocol: BaseViewInput {
     * Add here your methods for communication PRESENTER -> VIEW
     */
     func displayFlickrSearchImages(with viewModel: FlickrSearchModel)
-    func insertFlickrSearchImages(with viewModel: FlickrSearchModel, at indexPaths: [IndexPath])
     func resetViews()
     func changeViewState(_ state: ViewState)    
 }
@@ -76,11 +75,11 @@ protocol FlickrSearchWireFrameProtocol: class {
     /**
     * Add here your methods for communication PRESENTER -> WIREFRAME
     */
-    static func presentFlickrSearchModule(fromView:AnyObject)
+     func presentFlickrSearchModule(fromView:AnyObject)
    
 }
 
-protocol FlickrSearchPresenterProtocol: class {
+protocol FlickrSearchPresenterProtocol: AnyObject {
     var view: FlickrSearchViewProtocol? { get set }
     var interactor: FlickrSearchInteractorProtocol? { get set }
     var wireFrame: FlickrSearchWireFrameProtocol? { get set }
@@ -102,7 +101,6 @@ protocol FlickrSearchPresenterProtocol: class {
 
 protocol FlickrSearchInteractorProtocol: class{
     var presenter: FlickrSearchPresenterProtocol? { get set }
-    var APIManager: FlickrSearchAPIManagerProtocol? { get set }
 
     /**
     * Add here your methods for communication PRESENTER -> INTERACTOR
@@ -110,13 +108,4 @@ protocol FlickrSearchInteractorProtocol: class{
     func loadFlickrPhotos(imageName: String, pageNum: Int)
 
 }
-protocol FlickrSearchAPIManagerProtocol: class{
-   
-    /**
-    * Add here your methods for communication INTERACTOR -> APIDATAMANAGER
-    */
-    func 
-    getFlickrSearch(imageName: String, pageNum: Int, completionHandler: @escaping (Result<FlickrSearchPhoto, NetworkError>) -> ())
-  
 
-}

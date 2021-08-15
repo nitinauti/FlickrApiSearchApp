@@ -53,10 +53,10 @@ enum Endpoints: URLRequestConvertible {
             components?.queryItems = self.queryItems(from: parameters)
             var request = URLRequest(url: (components?.url)!)
             request.addValue(ContentType.value.rawValue, forHTTPHeaderField: ContentType.key.rawValue)
+            
             return request
         }
     }
-
 }
 
 protocol URLRequestConvertible {
@@ -66,7 +66,9 @@ protocol URLRequestConvertible {
 extension URLRequestConvertible{
     func queryItems(from params: [String: Any]) -> [URLQueryItem] {
         let queryItems: [URLQueryItem] = params.compactMap { parameter -> URLQueryItem? in
+           
             var result: URLQueryItem?
+          
             if let intValue = parameter.value as? Int {
                 result = URLQueryItem(name: parameter.key, value: String(intValue))
             } else if let stringValue = parameter.value as? String {

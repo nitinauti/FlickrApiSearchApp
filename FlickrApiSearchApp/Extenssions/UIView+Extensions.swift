@@ -9,29 +9,10 @@ import Foundation
 import UIKit
 
 extension UIView {
-    
-    //MARK: AutoLayout
-    func edgesToSuperView(constant: CGFloat = 0) {
-        guard let superview = superview else {
-            preconditionFailure("superview is missing for this view")
-        }
-        translatesAutoresizingMaskIntoConstraints = false
-        edges(to: superview, constant: constant)
 
-    }
-
-    func edges(to view: UIView, constant: CGFloat = 0) {
-        NSLayoutConstraint.activate([
-            topAnchor.constraint(equalTo: view.topAnchor),
-            leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            bottomAnchor.constraint(equalTo: view.bottomAnchor)
-        ])
-    }
-    
     func showSpinner() {
         let activityIndicator = UIActivityIndicatorView()
-        activityIndicator.color = UIColor.activityIndicatorColor
+        activityIndicator.color = UIColor.black
         activityIndicator.translatesAutoresizingMaskIntoConstraints = false
         activityIndicator.hidesWhenStopped = true
         activityIndicator.startAnimating()
@@ -45,4 +26,5 @@ extension UIView {
         spinner.stopAnimating()
         spinner.removeFromSuperview()
     }
+    
 }

@@ -17,6 +17,7 @@ enum Strings {
     static let retry = "Retry"
     static let error = "Error"
     static let close = "close"
+    static let placeholderImage = "imageNotFound"
 }
 
 enum Constants {
@@ -25,9 +26,16 @@ enum Constants {
     static let numberOfColumns: CGFloat = 2
     static let defaultPageNum: Int = 0
     static let defaultTotalCount: Int = 0
-    static let defaultPageSize: Int = 20
+    static let defaultPageSize: Int = 100
 }
 
 enum APIConstants {
     static let flickrAPIKey = "e4ec25586b1907ed41c31cdfcd1ed19e" //Change the API Key here
+}
+
+public enum ViewState: Equatable {
+    case none
+    case loading
+    case error(String)
+    case content
 }

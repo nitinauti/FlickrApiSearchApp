@@ -20,8 +20,5 @@ public class NavaigationContoller: UINavigationController {
         window?.makeKeyAndVisible()
     }
     
-    static func PushViewController(ViewController: UIViewController){
-        RootViewController.pushViewController(ViewController, animated: true)
-    }
     
 }

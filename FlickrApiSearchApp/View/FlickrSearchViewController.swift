@@ -8,38 +8,30 @@
 import Foundation
 import UIKit
 
-//MARK: ViewState
-public enum ViewState: Equatable {
-    case none
-    case loading
-    case error(String)
-    case content
-}
 
 
-//MARK: FlickrSearchViewController
 final class FlickrSearchViewController: UIViewController, FlickrSearchViewProtocol, FlickrSearchEventDelegate {
    
     var presenter: FlickrSearchPresenterProtocol?
     var viewState: ViewState = .none
     var flickrSearchModel: FlickrSearchModel?
+    let spacing = Constants.defaultSpacing
     var searchText = ""
     
-    lazy var collectionViewLayout: UICollectionViewFlowLayout = {
-        let layout = UICollectionViewFlowLayout()
-        let spacing = Constants.defaultSpacing
-        let itemSize: CGFloat = (UIScreen.main.bounds.width - (Constants.numberOfColumns - spacing) - 2) / Constants.numberOfColumns
-        layout.itemSize = CGSize(width: itemSize, height: itemSize)
-        layout.minimumInteritemSpacing = spacing
-        layout.minimumLineSpacing = spacing
-        layout.sectionInset = UIEdgeInsets(top: spacing, left: spacing, bottom: spacing, right: spacing)
-        return layout
+    lazy var itemSize: CGFloat = {
+        var itemsize =  CGFloat()
+         itemsize = (UIScreen.main.bounds.width - (Constants.numberOfColumns - spacing) - 2) / Constants.numberOfColumns
+         return itemsize
     }()
     
     lazy var collectionView: UICollectionView = {
-        let collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: collectionViewLayout)
+        let layout = UICollectionViewFlowLayout()
+        layout.minimumInteritemSpacing = spacing
+        layout.minimumLineSpacing = spacing
+        let collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: layout)
         collectionView.dataSource = self
         collectionView.delegate = self
+        collectionView.backgroundColor = .white
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         return collectionView
     }()
@@ -57,19 +49,10 @@ final class FlickrSearchViewController: UIViewController, FlickrSearchViewProtoc
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.view.backgroundColor = .white
         navigationItem.title = Strings.flickrSearchTitle
-        setupViews()
-        themeViews()
-    }
-    
-    private func setupViews() {
         configureCollectionView()
         configureSearchController()
-    }
-    
-    private func themeViews() {
-        view.backgroundColor = .backgroundColor
-        collectionView.backgroundColor = .backgroundColor
     }
     
     private func configureSearchController() {
@@ -81,7 +64,7 @@ final class FlickrSearchViewController: UIViewController, FlickrSearchViewProtoc
     
     private func configureCollectionView() {
         view.addSubview(collectionView)
-        collectionView.edgesToSuperView()
+        //collectionView.edgesToSuperView()
         collectionView.register(FlickrImageCell.self, forCellWithReuseIdentifier: FlickrImageCell.reuseIdentifier)
     }
     
@@ -92,9 +75,6 @@ final class FlickrSearchViewController: UIViewController, FlickrSearchViewProtoc
         case .loading:
             if flickrSearchModel == nil {
                 showSpinner()
-                showAlertView(title: Strings.cancelLoading, retryAction: { [weak self] in
-                    ImageDownloader.shared.cancelAll()
-                })
             }
         case .content:
             hideSpinner()
@@ -111,18 +91,10 @@ final class FlickrSearchViewController: UIViewController, FlickrSearchViewProtoc
         }
     }
 
-    /// Recvied image array From API and passed in model class
+    /// Recvied image array From API and passed in model class and reload Collectionview
     func displayFlickrSearchImages(with viewModel: FlickrSearchModel) {
         flickrSearchModel = viewModel
         collectionView.reloadData()
-    }
-    
-    /// called method in pagination
-    func insertFlickrSearchImages(with viewModel: FlickrSearchModel, at indexPaths: [IndexPath]) {
-        collectionView.performBatchUpdates({
-            self.flickrSearchModel = viewModel
-            self.collectionView.insertItems(at: indexPaths)
-        })
     }
     
     func resetViews() {
@@ -137,42 +109,22 @@ final class FlickrSearchViewController: UIViewController, FlickrSearchViewProtoc
         searchController.isActive = false
         guard !searchText.isEmpty || searchText != self.searchText else { return }
         presenter?.clearData()
-        
         self.searchText = searchText
         searchController.searchBar.text = searchText
-        ImageDownloader.shared.cancelAll()
         presenter?.getSearchedFlickrPhotos(SearchImageName: searchText)
-    }
-    
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        if #available(iOS 13.0, *), traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
-           themeViews()
+
+        /// called cancel api loading
+        if Reachability.isConnectedToNetwork() {
+            self.showAlertView(message: Strings.cancelLoading, Action: { [unowned self] in
+                self.cancelDownloading()
+            })
         }
     }
-}
-
-extension FlickrSearchViewController: UISearchBarDelegate {
     
-    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-       searchBar.resignFirstResponder()
-    }
-
-    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        guard let text = searchBar.text else {
-            return
-        }
-        searchBar.text = text
-        searchBar.resignFirstResponder()
-        searchController.isActive = false
-        guard !searchText.isEmpty || searchText != self.searchText else { return }
-        presenter?.clearData()
-        
-        self.searchText = text
-        searchController.searchBar.text = searchText
+    func cancelDownloading(){
         ImageDownloader.shared.cancelAll()
-        presenter?.getSearchedFlickrPhotos(SearchImageName: searchText)
     }
+    
 }
 
 //MARK: UICollectionViewDataSource & UICollectionViewDelegate
@@ -194,9 +146,19 @@ extension FlickrSearchViewController: UICollectionViewDataSource, UICollectionVi
             return cell
         }
         let imageURL = viewModel.imageUrlAt(indexPath.row)
-        cell.configure(imageURL: imageURL, size: collectionViewLayout.itemSize, indexPath: indexPath)
+        cell.configure(imageURL: imageURL, size: CGSize(width: itemSize, height: itemSize), indexPath: indexPath)
         return cell
     }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize
+      {
+          return CGSize(width: itemSize, height: itemSize)
+      }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets
+       {
+           return UIEdgeInsets(top: spacing, left: spacing, bottom: spacing, right: spacing)
+       }
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         guard let viewModel = flickrSearchModel else { return }
@@ -204,6 +166,10 @@ extension FlickrSearchViewController: UICollectionViewDataSource, UICollectionVi
             return
         }
         presenter?.getSearchedFlickrPhotos(SearchImageName: searchText)
+        self.showAlertView(message: Strings.cancelLoading, Action: { [unowned self] in
+            self.cancelDownloading()
+        })
+
     }
     
 }

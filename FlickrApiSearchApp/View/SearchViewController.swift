@@ -17,11 +17,12 @@ final class SearchViewController: UIViewController, UISearchBarDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .backgroundColor
+        view.backgroundColor = .white
     }
 
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
        searchBar.resignFirstResponder()
+
     }
 
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {

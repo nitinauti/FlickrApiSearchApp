@@ -14,6 +14,9 @@ enum NetworkError: Swift.Error, CustomStringConvertible {
     case emptyData
     case decodingError
     case somethingWentWrong
+    case imageFail
+    case invalidStatus(Int)
+
     
     public var description: String {
         switch self {
@@ -27,6 +30,10 @@ enum NetworkError: Swift.Error, CustomStringConvertible {
             return "Something went wrong."
         case .noInternetError:
              return "No internet connection. Please try again after some time"
+        case .imageFail:
+             return "image failed to download from url"
+        case let .invalidStatus(stausCode):
+             return "return invalid status code:  \(stausCode)"
         }
     }
 }

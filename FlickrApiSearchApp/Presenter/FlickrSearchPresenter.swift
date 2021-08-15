@@ -6,6 +6,8 @@
 //
 
 import Foundation
+import UIKit
+
 class FlickrSearchPresenter {
     var view: FlickrSearchViewProtocol?
     var interactor: FlickrSearchInteractorProtocol?
@@ -20,12 +22,14 @@ class FlickrSearchPresenter {
 
 extension FlickrSearchPresenter: FlickrSearchPresenterProtocol {
        
+    /// check state of api
     func flickrSearchError(_ error: NetworkError){
         DispatchQueue.main.async {
           self.view?.changeViewState(.error(error.description))
         }
     }
-
+    
+    /// check totoal pages
     var isMoreDataAvailable: Bool {
         guard totalPages != 0 else {
             return true
@@ -33,7 +37,7 @@ extension FlickrSearchPresenter: FlickrSearchPresenterProtocol {
         return pageNum < totalPages
     }
     
-    ///
+    /// increased page number
     func getSearchedFlickrPhotos(SearchImageName: String) {
         guard isMoreDataAvailable else { return }
         view?.changeViewState(.loading)
@@ -58,26 +62,22 @@ extension FlickrSearchPresenter: FlickrSearchPresenterProtocol {
             }
         } else {
             /// method called for page count 2
-            appendMoreFlickrPhotos(with: flickrPhotoUrlList)
+            appendMoreFlickrPhotos(flickrPhotoUrlList: flickrPhotoUrlList)
         }
     }
     
     /// method called after suseesfully load first page .
-    fileprivate func appendMoreFlickrPhotos(with flickrPhotoUrlList: [URL]) {
-        let previousCount = totalCount
+    fileprivate func appendMoreFlickrPhotos(flickrPhotoUrlList: [URL]) {
         totalCount += flickrPhotoUrlList.count
         flickrSearchModel.addMorePhotoUrls(flickrPhotoUrlList)
       
-        let indexPaths: [IndexPath] = (previousCount..<totalCount).map {
-            return IndexPath(item: $0, section: 0)
-        }
         DispatchQueue.main.async { [unowned self] in
-            self.view?.insertFlickrSearchImages(with: self.flickrSearchModel, at: indexPaths)
+            self.view?.displayFlickrSearchImages(with: self.flickrSearchModel)
             self.view?.changeViewState(.content)
         }
     }
     
-    
+    /// create image url with provided parameter
     func crateFlickrPhotoUrlList(from photos: [FlickrPhoto]) -> [URL] {
         let flickrPhotoUrlList = photos.compactMap { (photo) -> URL? in
             let url = "https://farm\(photo.farm).staticflickr.com/\(photo.server)/\(photo.id)_\(photo.secret)_z.jpg"
@@ -89,6 +89,7 @@ extension FlickrSearchPresenter: FlickrSearchPresenterProtocol {
         return flickrPhotoUrlList
     }
     
+    /// clear all data
     func clearData() {
         pageNum = Constants.defaultPageNum
         totalCount = Constants.defaultTotalCount
@@ -97,5 +98,5 @@ extension FlickrSearchPresenter: FlickrSearchPresenterProtocol {
         view?.resetViews()
         view?.changeViewState(.none)
     }
-    
+  
 }

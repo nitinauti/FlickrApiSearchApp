@@ -13,22 +13,21 @@ final class ImageOperation: Operation {
     
     public let imageURL: URL
     private var downloadTask: URLSessionDownloadTask?
-    private let size: CGSize
-    private let scale: CGFloat
+    let networkProtocol : NetworkProtocol
 
-    init(imageURL: URL, size: CGSize, scale: CGFloat) {
+    init(imageURL: URL, network:NetworkProtocol) {
         self.imageURL = imageURL
-        self.size = size
-        self.scale = scale
+        self.networkProtocol = network
     }
     
-    /// opration sate
+    
+//    /// opration sate
     private enum OperationState: String, Equatable {
         case ready = "isReady"
         case executing = "isExecuting"
         case finished = "isFinished"
     }
-    
+
     private var _state = OperationState.ready {
         willSet {
             willChangeValue(forKey: newValue.rawValue)
@@ -39,7 +38,7 @@ final class ImageOperation: Operation {
             didChangeValue(forKey: _state.rawValue)
         }
     }
-    
+
     private var state: OperationState {
         get {
             return _state
@@ -48,24 +47,26 @@ final class ImageOperation: Operation {
             _state = newValue
         }
     }
-    
+
     // MARK: - Various `Operation` properties
     override var isReady: Bool {
         return state == .ready && super.isReady
     }
-    
+
     override var isExecuting: Bool {
         return state == .executing
     }
-    
+
     override var isFinished: Bool {
         return state == .finished
     }
-    
-    
+
+
     // MARK: - Start
     override func start() {
         if isCancelled {
+            print("opration cancelled 2222")
+
             finish()
             return
         }
@@ -76,17 +77,18 @@ final class ImageOperation: Operation {
 
         main()
     }
-    
+
     // MARK: - Finish
         func finish() {
         if isExecuting {
             state = .finished
         }
     }
-    
+
     // MARK: - Cancel
     override func cancel() {
         downloadTask?.cancel()
+        print("opration cancelled")
         finish()
         super.cancel()
     }
@@ -97,8 +99,10 @@ final class ImageOperation: Operation {
     }
     
     private func downloadImage() {
-        print("called for get image from image URL")
-        downloadTask = NetworkManager.downloadRequest(imageURL, size: size, scale: UIScreen.main.scale, completion: { [weak self] (result: Result<UIImage, NetworkError>) in
+        print("image url in opration", imageURL)
+        print("opration cancelled 11111")
+ 
+        downloadTask = self.networkProtocol.downloadImageRequest(imageURL, completion: { [weak self] (result: Result<UIImage, NetworkError>) in
             self?.imageDownloadCompletionHandler?(result)
             self?.finish()
         })

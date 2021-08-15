@@ -8,26 +8,31 @@
 import Foundation
 import UIKit
 
-public class NetworkManager {
+protocol NetworkProtocol {
+    @discardableResult
+    func connect<RequestType: Codable, ResponseType: Decodable>(httpMethod: HTTPMethod, request: URLRequest, responseType: ResponseType.Type, body: RequestType, completion: @escaping (Result<ResponseType, NetworkError>) -> Void) -> URLSessionDataTask
+    
+    func downloadImageRequest(_ url: URL, completion: @escaping (Result<UIImage, NetworkError>) -> Void) -> URLSessionDownloadTask
+
+}
+
+public class NetworkManager: NetworkProtocol {
     
     /// Api Base request called from each module
-    static func connect<RequestType: Codable, ResponseType: Decodable>(httpMethod: HTTPMethod, request: URLRequest, responseType: ResponseType.Type, body: RequestType, completion: @escaping (Result<ResponseType, NetworkError>) -> Void) {
+    @discardableResult
+    func connect<RequestType: Codable, ResponseType: Decodable>(httpMethod: HTTPMethod, request: URLRequest, responseType: ResponseType.Type, body: RequestType, completion: @escaping (Result<ResponseType, NetworkError>) -> Void) -> URLSessionDataTask {
         
-        if !Reachability.isConnectedToNetwork() {
-            DispatchQueue.main.async {
-                completion(.failure(NetworkError.noInternetError))
-            }
-            return
-        }
+        
         var request = request
         request.httpMethod = httpMethod.rawValue
         if httpMethod != .get {
             request.httpBody = try! JSONEncoder().encode(body)
         }
+        print("current Request URL:  ",request)
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
-            data?.printJSON()
+        data?.printJSON()
                         
-        guard let data = data, error == nil else {
+             guard let data = data, error == nil else {
                 if let error = error as NSError?, error.domain == NSURLErrorDomain {
                     DispatchQueue.main.async {
                         completion(.failure(NetworkError.apiError(error)))
@@ -53,70 +58,57 @@ public class NetworkManager {
                     DispatchQueue.main.async {
                         completion(.failure(NetworkError.somethingWentWrong))
                     }
-                    return
+                return
             }
         }
         task.resume()
+        return task
     }
     
     
     /// download  image form request called from each module
-    static func downloadRequest(_ url: URL, size: CGSize, scale: CGFloat, completion: @escaping (Result<UIImage, NetworkError>) -> Void) -> URLSessionDownloadTask {
+    func downloadImageRequest(_ url: URL, completion: @escaping (Result<UIImage, NetworkError>) -> Void) -> URLSessionDownloadTask {
        
-     let downloadTask = URLSession.shared.downloadTask(with: url) { (location: URL?, response: URLResponse?, error: Error?) in
+       let downloadTask = URLSession.shared.downloadTask(with: url) { (imageUrl: URL?, response: URLResponse?, error: Error?) in
+            
             if let error = error {
                 completion(.failure(.apiError(error)))
                 return
             }
-            guard let location = location else {
+           
+            guard let imageurl = imageUrl else {
                 completion(Result.failure(.emptyData))
                 return
             }
-            guard let downloadedImage = self.downsampleImage(from: location, pointSize: size, scale: scale) else {
-                if let data = try? Data(contentsOf: location), let image = UIImage(data: data) {
+               
+            if let data = try? Data(contentsOf: imageurl), let image = UIImage(data: data) {
                     completion(.success(image))
                 } else {
-                    completion(.failure(.emptyData))
-                }
-                return
+                    completion(.failure(.imageFail))
             }
-            completion(.success(downloadedImage))
+            return
         }
         downloadTask.resume()
         return downloadTask
     }
-    
-    //MARK: Downsample Image to given Size
-   static func downsampleImage(from url: URL, pointSize: CGSize, scale: CGFloat) -> UIImage? {
-        let imageSourceOptions = [kCGImageSourceShouldCache: false] as CFDictionary
-        guard let imageSource = CGImageSourceCreateWithURL(url as CFURL, imageSourceOptions) else {
-            return nil
-        }
-        let maxDimensionInPixels = max(pointSize.width, pointSize.height) * scale
-        let downsampleOptions = [
-             kCGImageSourceCreateThumbnailFromImageAlways: true,
-             kCGImageSourceShouldCacheImmediately: true,
-             kCGImageSourceCreateThumbnailWithTransform: true,
-             kCGImageSourceThumbnailMaxPixelSize: maxDimensionInPixels
-        ] as CFDictionary
-        
-        guard let downSampledImage = CGImageSourceCreateThumbnailAtIndex(imageSource, 0, downsampleOptions) else {
-            return nil
-        }
-        return UIImage(cgImage: downSampledImage)
-    }
- 
+     
 }
 
 extension Data {
     func printJSON() {
         if let JSONString = String(data: self, encoding: String.Encoding.utf8) {
-            print(JSONString)
+            print("Response ", JSONString)
         }
     }
 }
 
-struct ErrorModel: Error {
-    let message: String
+struct urlRequest {
+    
+    func urlRequest()->URLRequest{
+        var urlRequest = URLRequest(url: URL(string: "")!)
+        urlRequest.httpMethod = HTTPMethod.get.rawValue
+        urlRequest.addValue(ContentType.value.rawValue, forHTTPHeaderField: ContentType.key.rawValue)
+        
+        return urlRequest
+    }
 }
-

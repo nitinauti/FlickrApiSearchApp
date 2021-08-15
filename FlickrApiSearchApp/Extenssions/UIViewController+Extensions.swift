@@ -21,17 +21,18 @@ extension UIViewController {
         present(alertViewController, animated: true)
     }
     
-    func showAlertView(title: String, retryAction: (() -> Void)? = nil) {
-        let alertViewController = UIAlertController(title: title, message: "", preferredStyle: .alert)
-  
-        let title =  Strings.cancel
-        alertViewController.addAction(UIAlertAction(title: title, style: .default) { _ in
-            retryAction?()
-        })
-        present(alertViewController, animated: true)
+    
+    func showAlertView(message: String, Action: (() -> Void)? = nil) {
+        
+        let alert = UIAlertController(title: nil, message: message, preferredStyle: UIAlertController.Style.alert)
+        alert.addAction(UIAlertAction(title: Strings.ok, style: UIAlertAction.Style.default, handler: nil))
+        alert.addAction(UIAlertAction(title: Strings.cancel, style: UIAlertAction.Style.cancel, handler: nil))
+
+        self.present(alert, animated: true, completion: nil)
     }
     
     func dissmissAlertView(){
         self.dismiss(animated: true, completion: nil)
     }
+    
 }

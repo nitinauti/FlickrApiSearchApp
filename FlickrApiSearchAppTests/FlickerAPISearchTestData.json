@@ -1,0 +1,33 @@
+{
+  "photos": {
+    "page": 1,
+    "pages": 1,
+    "perpage": 2,
+    "total": 2,
+    "photo": [
+      {
+        "id": "51377731008",
+        "owner": "79453007@N00",
+        "secret": "3756203bbb",
+        "server": "65535",
+        "farm": 66,
+        "title": "heron_green_21dkral8400",
+        "ispublic": 1,
+        "isfriend": 0,
+        "isfamily": 0
+      },
+      {
+        "id": "51377498031",
+        "owner": "62459525@N03",
+        "secret": "12ebed6db2",
+        "server": "65535",
+        "farm": 66,
+        "title": "Crocothemis erythraea",
+        "ispublic": 1,
+        "isfriend": 0,
+        "isfamily": 0
+      }
+    ]
+  },
+  "stat": "ok"
+}

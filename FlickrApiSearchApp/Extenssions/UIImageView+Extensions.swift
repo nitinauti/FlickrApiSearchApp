@@ -27,13 +27,9 @@ extension UIImageView {
     
     
     /// load image from remote url
-    /// - Parameters:
-    ///   - imageURL: is the `URL` which points to Https url
-    ///   - placeholder: `UIImage` placeholder
-    ///   - size: image container size
     func loadImage(
         with imageURL: URL,
-        placeholder: UIImage? = UIImage(color: .placeholder),
+        placeholder: UIImage? = UIImage(color: .black),
         size: CGSize
     ) {
         image = placeholder
@@ -50,9 +46,7 @@ extension UIImageView {
                         if isCached {
                             self.image = downloadedImage
                         } else {
-                            UIView.transition(with: self, duration: 0.5, options: .transitionCrossDissolve, animations: {
-                                self.image = downloadedImage
-                            }, completion: nil)
+                            self.image = downloadedImage
                         }
                     } else {
                         self.image = placeholder

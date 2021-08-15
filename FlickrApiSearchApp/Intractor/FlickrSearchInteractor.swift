@@ -9,19 +9,23 @@ import Foundation
 
 class FlickrSearchInteractor: FlickrSearchInteractorProtocol {
     var presenter: FlickrSearchPresenterProtocol?
-    var APIManager: FlickrSearchAPIManagerProtocol?
-      
+    
+    let networkProtocol : NetworkProtocol
+    
+    init(network:NetworkProtocol) {
+        self.networkProtocol = network
+    }
+
     func loadFlickrPhotos(imageName: String, pageNum: Int) {
-        
-        APIManager?.getFlickrSearch(imageName: imageName, pageNum: pageNum, completionHandler: { result  in
-            print(result)
+      
+        networkProtocol.connect(httpMethod: .post, request: Endpoints.getFlickrSearch(imageName, pageNum).urlRequest, responseType: FlickrSearchPhoto.self, body: Body()) { result  in
+            
             switch result {
             case .success(let FlickrSearch):
                 self.presenter?.flickrSearchSuccess(flickrPhotos: FlickrSearch.photos)
             case .failure(let error):
-                self.presenter?.flickrSearchError(NetworkError.apiError(error))
+                self.presenter?.flickrSearchError(error)
             }
-        })
+        }
     }
-
 }
